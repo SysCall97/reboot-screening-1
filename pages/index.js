@@ -94,12 +94,21 @@ const Snake = () => {
 
         // make a new snake by extending head
         // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax
-        const newSnake = [newHead, ...snake];
+        const newSnake = [...snake];
 
         // remove tail
         newSnake.pop();
 
-        return newSnake;
+        if(!!newSnake.find(pixel => pixel.x === newHead.x && pixel.y === newHead.y)) {
+          setDirection(Direction.Right);
+          setFood([{ x: 4, y: 10, counter: 0 }]);
+          alert(`Game Over. Your score: ${score}`)
+          setScore(0);
+          setTimeCounter(0);
+          return getDefaultSnake();
+        }
+
+        return [newHead, ...newSnake];
       });
     };
 
@@ -140,37 +149,9 @@ const Snake = () => {
 
       setFood(prev => {
         return [newFood, ...prev.filter(item => !isSnake(item))];
-        // let arr = [newFood];
-        // arr = [...arr, ...prev.map(item => {
-        //   if(!isSnake(item)) return item;
-        // }).filter(Boolean)];
-        // return arr;
       });
     }
   }, [snake]);
-
-// add a new food after 3 seconds
-  // useEffect(() => {
-  //   const addNewFood = () => {
-  //     let newFood = getRandomCell();
-  //     while (isSnake(newFood)) {
-  //       newFood = getRandomCell();
-  //     }
-  //     newFood.counter = 0;
-
-  //     setFood(prev => {
-  //       let arr = [newFood];
-  //       arr = [...arr, ...prev.map(item => {
-  //         if(!isSnake(item)) return item;
-  //       }).filter(Boolean)];
-  //       return arr;
-  //     });
-  //   }
-
-    // const timer = setInterval(addNewFood, 3000);
-
-    // return () => clearInterval(timer);
-  // }, []);
 
   // modify food after 3 and 10 seconds
    useEffect(() => {
