@@ -75,7 +75,7 @@ const Snake = () => {
   const [snake, setSnake] = useState(getDefaultSnake());
   const [direction, setDirection] = useState(Direction.Right);
 
-  const [food, setFood] = useState({ x: 4, y: 10 });
+  const [food, setFood] = useState([{ x: 4, y: 10 }, {x: 5, y: 11}]);
   const [score, setScore] = useState(0);
 
   // move the snake
@@ -135,7 +135,13 @@ const Snake = () => {
         newFood = getRandomCell();
       }
 
-      setFood(newFood);
+      setFood(prev => {
+        let arr = [newFood];
+        arr = [...arr, ...prev.map(item => {
+          if(!isSnake(item)) return item;
+        }).filter(Boolean)];
+        return arr;
+      });
     }
   }, [snake]);
 
@@ -182,7 +188,8 @@ const Snake = () => {
 
   // ?. is called optional chaining
   // see: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Optional_chaining
-  const isFood = ({ x, y }) => food.x === x && food.y === y;
+  const isFood = ({ x, y }) => 
+    food.find((position) => position.x === x && position.y === y);
 
   const isSnake = ({ x, y }) =>
     snake.find((position) => position.x === x && position.y === y);
