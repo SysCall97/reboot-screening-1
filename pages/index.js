@@ -75,8 +75,10 @@ const Snake = () => {
   const [snake, setSnake] = useState(getDefaultSnake());
   const [direction, setDirection] = useState(Direction.Right);
 
-  const [food, setFood] = useState([{ x: 4, y: 10 }, {x: 5, y: 11}]);
+  const [food, setFood] = useState([{ x: 4, y: 10, counter: 0 }]);
   const [score, setScore] = useState(0);
+
+  const [timeCounter, setTimeCounter] = useState(0);
 
   // move the snake
   useEffect(() => {
@@ -134,16 +136,73 @@ const Snake = () => {
       while (isSnake(newFood)) {
         newFood = getRandomCell();
       }
+      newFood.counter = 0;
 
       setFood(prev => {
-        let arr = [newFood];
-        arr = [...arr, ...prev.map(item => {
-          if(!isSnake(item)) return item;
-        }).filter(Boolean)];
-        return arr;
+        return [newFood, ...prev.filter(item => !isSnake(item))];
+        // let arr = [newFood];
+        // arr = [...arr, ...prev.map(item => {
+        //   if(!isSnake(item)) return item;
+        // }).filter(Boolean)];
+        // return arr;
       });
     }
   }, [snake]);
+
+// add a new food after 3 seconds
+  // useEffect(() => {
+  //   const addNewFood = () => {
+  //     let newFood = getRandomCell();
+  //     while (isSnake(newFood)) {
+  //       newFood = getRandomCell();
+  //     }
+  //     newFood.counter = 0;
+
+  //     setFood(prev => {
+  //       let arr = [newFood];
+  //       arr = [...arr, ...prev.map(item => {
+  //         if(!isSnake(item)) return item;
+  //       }).filter(Boolean)];
+  //       return arr;
+  //     });
+  //   }
+
+    // const timer = setInterval(addNewFood, 3000);
+
+    // return () => clearInterval(timer);
+  // }, []);
+
+  // modify food after 3 and 10 seconds
+   useEffect(() => {
+    const modifyFood = () => {
+      setTimeCounter(prev => {
+        setFood(item => {
+          const arr = item.map(it => {
+            return {...it, counter: it.counter+1};
+          });
+          
+          if((prev + 1) % 3 === 0) {
+            let newFood = getRandomCell();
+            while (isSnake(newFood)) {
+              newFood = getRandomCell();
+            }
+            newFood.counter = 0;
+            arr.push(newFood);
+          }
+          return arr.filter(it => it.counter < 10);
+        });
+        
+
+        return (prev + 1) % 3;
+      });
+
+
+    }
+
+    const timer = setInterval(modifyFood, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     const handleNavigation = (event) => {
