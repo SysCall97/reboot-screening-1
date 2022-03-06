@@ -177,6 +177,7 @@ const customHook = () => {
     return () => clearInterval(interval);
   }, []);
 
+  // remove food after 10 second it created
   useEffect(() => {
     const interval = setInterval(() => {
       setFoods(
