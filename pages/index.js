@@ -63,7 +63,7 @@ const getRandomCell = () => ({
   y: Math.floor(Math.random() * Config.width),
 });
 
-const Snake = () => {
+const customHook = () => {
   const getDefaultSnake = () => [
     { x: 8, y: 12 },
     { x: 7, y: 12 },
@@ -151,6 +151,13 @@ const Snake = () => {
   const isSnake = ({ x, y }) =>
     snake.find((position) => position.x === x && position.y === y);
 
+  return {
+    isFood, isSnake, score
+  }
+}
+
+const Snake = () => {
+  const { isFood, isSnake, score } = customHook();
   const cells = [];
   for (let x = 0; x < Config.width; x++) {
     for (let y = 0; y < Config.height; y++) {
