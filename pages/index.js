@@ -117,22 +117,28 @@ const customHook = () => {
   }, [snake]);
 
   useEffect(() => {
+    const handleSetDirection = (opposite, curr) => {
+      setDirection(prev => {
+        if(prev !== opposite) return curr;
+        return prev;
+      });
+    }
     const handleNavigation = (event) => {
       switch (event.key) {
         case "ArrowUp":
-          setDirection(Direction.Top);
+          handleSetDirection(Direction.Bottom, Direction.Top);
           break;
 
         case "ArrowDown":
-          setDirection(Direction.Bottom);
+          handleSetDirection(Direction.Top, Direction.Bottom);
           break;
 
         case "ArrowLeft":
-          setDirection(Direction.Left);
+          handleSetDirection(Direction.Right, Direction.Left);
           break;
 
         case "ArrowRight":
-          setDirection(Direction.Right);
+          handleSetDirection(Direction.Left, Direction.Right);
           break;
       }
     };
