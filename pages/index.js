@@ -69,13 +69,21 @@ const customHook = () => {
     { x: 7, y: 12 },
     { x: 6, y: 12 },
   ];
+
+  const getInitialFood = () => ({ x: 4, y: 10 });
   const grid = useRef();
 
   // snake[0] is head and snake[snake.length - 1] is tail
   const [snake, setSnake] = useState(getDefaultSnake());
   const [direction, setDirection] = useState(Direction.Right);
 
-  const [food, setFood] = useState({ x: 4, y: 10 });
+  const [food, setFood] = useState(getInitialFood());
+
+  const resetGame = () => {
+    setSnake(getDefaultSnake());
+    setDirection(Direction.Right);
+    setFood(getInitialFood());
+  }
 
   // move the snake
   useEffect(() => {
@@ -91,6 +99,10 @@ const customHook = () => {
         // remove tail
         if(!isFood(newHead))
         newSnake.pop();
+
+        if(isSnake(newHead)) {
+          resetGame();
+        }
 
         return newSnake;
       });
