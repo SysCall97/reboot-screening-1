@@ -70,7 +70,7 @@ const customHook = () => {
     { x: 6, y: 12 },
   ];
 
-  const getInitialFood = () => [{ x: 4, y: 10 }];
+  const getInitialFood = () => [{ x: 4, y: 10, counter: 0 }];
   const grid = useRef();
 
   // snake[0] is head and snake[snake.length - 1] is tail
@@ -89,11 +89,12 @@ const customHook = () => {
     let newFood = getRandomCell();
     while (isSnake(newFood) && isFood(newFood)) {
         newFood = getRandomCell();
-      }
+    }
+    newFood.counter = 0;
 
-      setFoods(prev => {
-        return [newFood, ...prev.filter(item => !isSnake(item))];
-      });
+    setFoods(prev => {
+      return [newFood, ...prev.filter(item => !isSnake(item))];
+    });
   }
 
   // move the snake
@@ -176,6 +177,18 @@ const customHook = () => {
     return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setFoods(
+        foods => {
+          return foods.map(food => ({...food, counter: food.counter + 1})).filter(food => food.counter < 10);
+        }
+      );
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   // ?. is called optional chaining
   // see: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Optional_chaining
   const isFood = ({ x, y }) => foods.some(food => food.x === x && food.y === y);
@@ -184,7 +197,9 @@ const customHook = () => {
     snake.find((position) => position.x === x && position.y === y);
 
   return {
-    isFood, isSnake, score: snake.length - getDefaultSnake().length
+    isFood, 
+    isSnake, 
+    score: snake.length - getDefaultSnake().length
   }
 }
 
