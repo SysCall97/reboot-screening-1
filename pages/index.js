@@ -63,7 +63,7 @@ const getRandomCell = () => ({
   y: Math.floor(Math.random() * Config.width),
 });
 
-const Snake = () => {
+const useHooks = () => {
   const getDefaultSnake = () => [
     { x: 8, y: 12 },
     { x: 7, y: 12 },
@@ -76,7 +76,6 @@ const Snake = () => {
   const [direction, setDirection] = useState(Direction.Right);
 
   const [food, setFood] = useState([{ x: 4, y: 10, counter: 0 }]);
-  const [score, setScore] = useState(0);
 
   const [timeCounter, setTimeCounter] = useState(0);
 
@@ -102,8 +101,7 @@ const Snake = () => {
         if(!!newSnake.find(pixel => pixel.x === newHead.x && pixel.y === newHead.y)) {
           setDirection(Direction.Right);
           setFood([{ x: 4, y: 10, counter: 0 }]);
-          alert(`Game Over. Your score: ${score}`)
-          setScore(0);
+          alert(`Game Over. Your score: ${snake.length - getDefaultSnake().length}`);
           setTimeCounter(0);
           return getDefaultSnake();
         }
@@ -135,10 +133,6 @@ const Snake = () => {
         const newSnake = [...snake, newTail];
 
         return newSnake;
-      });
-      
-      setScore((score) => {
-        return score + 1;
       });
 
       let newFood = getRandomCell();
@@ -186,37 +180,32 @@ const Snake = () => {
   }, []);
 
   useEffect(() => {
+    const handleSetDirection = (direction, oppositeDirection) => {
+      setDirection(prev => {
+        if(prev != oppositeDirection) return direction;
+        return prev;
+      });
+    };
+
     const handleNavigation = (event) => {
       switch (event.key) {
         case "ArrowUp": {
-          setDirection(prev => {
-            if(prev != Direction.Bottom) return Direction.Top;
-            return prev;
-          });
+          handleSetDirection(Direction.Top, Direction.Bottom);
           break;
         }
 
         case "ArrowDown": {
-          setDirection(prev => {
-            if(prev != Direction.Top) return Direction.Bottom;
-            return prev;
-          });
+          handleSetDirection(Direction.Bottom, Direction.Top);
           break;
         }
 
         case "ArrowLeft": {
-          setDirection(prev => {
-            if(prev != Direction.Right) return Direction.Left;
-            return prev;
-          });
+          handleSetDirection(Direction.Left, Direction.Right);
           break;
         }
 
         case "ArrowRight": {
-          setDirection(prev => {
-            if(prev != Direction.Left) return Direction.Right;
-            return prev;
-          });
+          handleSetDirection(Direction.Right, Direction.Left);
           break;
         }
       }
@@ -229,10 +218,16 @@ const Snake = () => {
   // ?. is called optional chaining
   // see: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Optional_chaining
   const isFood = ({ x, y }) => 
-    food.find((position) => position.x === x && position.y === y);
+    !!food.find((position) => position.x === x && position.y === y);
 
   const isSnake = ({ x, y }) =>
-    snake.find((position) => position.x === x && position.y === y);
+    !!snake.find((position) => position.x === x && position.y === y);
+
+  return {isFood, isSnake, score: snake.length - getDefaultSnake().length};
+}
+
+const Snake = () => {
+  const {isFood, isSnake, score} = useHooks();
 
   const cells = [];
   for (let x = 0; x < Config.width; x++) {
