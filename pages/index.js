@@ -90,12 +90,10 @@ const customHook = () => {
     const runSingleStep = () => {
       setSnake((snake) => {
         const head = snake[0];
-        const newHead = { x: head.x + direction.x, y: head.y + direction.y };
-
-        if(newHead.x >= Config.height) newHead.x = 0;
-        else if(newHead.x < 0) newHead.x = Config.height - 1;
-        else if(newHead.y >= Config.width) newHead.y = 0;
-        else if(newHead.y < 0) newHead.y = Config.width - 1;
+        const newHead = { 
+          x: (head.x + direction.x + Config.width) % Config.width, 
+          y: (head.y + direction.y + Config.height) % Config.height
+        };
 
         // make a new snake by extending head
         // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax
