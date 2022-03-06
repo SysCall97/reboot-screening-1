@@ -85,6 +85,17 @@ const customHook = () => {
     setFoods(getInitialFood());
   }
 
+  const addNewFood = () => {
+    let newFood = getRandomCell();
+    while (isSnake(newFood) && isFood(newFood)) {
+        newFood = getRandomCell();
+      }
+
+      setFoods(prev => {
+        return [newFood, ...prev.filter(item => !isSnake(item))];
+      });
+  }
+
   // move the snake
   useEffect(() => {
     const runSingleStep = () => {
@@ -121,15 +132,7 @@ const customHook = () => {
   useEffect(() => {
     const head = snake[0];
     if (isFood(head)) {
-
-      let newFood = getRandomCell();
-      while (isSnake(newFood)) {
-        newFood = getRandomCell();
-      }
-
-      setFoods(prev => {
-        return [newFood, ...prev.filter(item => !isSnake(item))];
-      });
+      addNewFood();
     }
   }, [snake]);
 
@@ -167,12 +170,7 @@ const customHook = () => {
   // add food after every 3 sec
   useEffect(() => {
     const interval = setInterval(() => {
-      let newFood = getRandomCell();
-      while (isSnake(newFood) && isFood(newFood)) {
-        newFood = getRandomCell();
-      }
-
-      setFoods(prev => [...prev, newFood]);
+      addNewFood();
     }, 3000)
 
     return () => clearInterval(interval);
