@@ -76,7 +76,6 @@ const customHook = () => {
   const [direction, setDirection] = useState(Direction.Right);
 
   const [food, setFood] = useState({ x: 4, y: 10 });
-  const [score, setScore] = useState(0);
 
   // move the snake
   useEffect(() => {
@@ -90,6 +89,7 @@ const customHook = () => {
         const newSnake = [newHead, ...snake];
 
         // remove tail
+        if(!isFood(newHead))
         newSnake.pop();
 
         return newSnake;
@@ -106,9 +106,6 @@ const customHook = () => {
   useEffect(() => {
     const head = snake[0];
     if (isFood(head)) {
-      setScore((score) => {
-        return score + 1;
-      });
 
       let newFood = getRandomCell();
       while (isSnake(newFood)) {
@@ -152,7 +149,7 @@ const customHook = () => {
     snake.find((position) => position.x === x && position.y === y);
 
   return {
-    isFood, isSnake, score
+    isFood, isSnake, score: snake.length - getDefaultSnake().length
   }
 }
 
