@@ -70,19 +70,19 @@ const customHook = () => {
     { x: 6, y: 12 },
   ];
 
-  const getInitialFood = () => ({ x: 4, y: 10 });
+  const getInitialFood = () => [{ x: 4, y: 10 }];
   const grid = useRef();
 
   // snake[0] is head and snake[snake.length - 1] is tail
   const [snake, setSnake] = useState(getDefaultSnake());
   const [direction, setDirection] = useState(Direction.Right);
 
-  const [food, setFood] = useState(getInitialFood());
+  const [foods, setFoods] = useState(getInitialFood());
 
   const resetGame = () => {
     setSnake(getDefaultSnake());
     setDirection(Direction.Right);
-    setFood(getInitialFood());
+    setFoods(getInitialFood());
   }
 
   // move the snake
@@ -115,7 +115,7 @@ const customHook = () => {
     const timer = setInterval(runSingleStep, 500);
 
     return () => clearInterval(timer);
-  }, [direction, food]);
+  }, [direction, foods]);
 
   // update score whenever head touches a food
   useEffect(() => {
@@ -127,7 +127,9 @@ const customHook = () => {
         newFood = getRandomCell();
       }
 
-      setFood(newFood);
+      setFoods(prev => {
+        return [newFood, ...prev.filter(item => !isSnake(item))];
+      });
     }
   }, [snake]);
 
@@ -162,9 +164,23 @@ const customHook = () => {
     return () => window.removeEventListener("keydown", handleNavigation);
   }, []);
 
+  // add food after every 3 sec
+  useEffect(() => {
+    const interval = setInterval(() => {
+      let newFood = getRandomCell();
+      while (isSnake(newFood) && isFood(newFood)) {
+        newFood = getRandomCell();
+      }
+
+      setFoods(prev => [...prev, newFood]);
+    }, 3000)
+
+    return () => clearInterval(interval);
+  }, []);
+
   // ?. is called optional chaining
   // see: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Optional_chaining
-  const isFood = ({ x, y }) => food?.x === x && food?.y === y;
+  const isFood = ({ x, y }) => foods.some(food => food.x === x && food.y === y);
 
   const isSnake = ({ x, y }) =>
     snake.find((position) => position.x === x && position.y === y);
